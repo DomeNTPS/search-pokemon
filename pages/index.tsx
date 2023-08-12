@@ -1,13 +1,30 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { gql, useLazyQuery, useQuery } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import GET_POKEMON from "../gql/queries/pokemon";
 import Card from "../components/pokemon-card/card";
 
-interface pokemonData {
+export interface pokemonData {
+  id: string;
+  number: string;
   name: string;
+  weight: {
+    minimum: string;
+    maximum: string;
+  };
+  height: {
+    minimum: string;
+    maximum: string;
+  };
+  classification: string;
+  types: string[];
+  resistant: string[];
+  weaknesses: string[];
+  fleeRate: number;
+  maxCP: number;
+  maxHP: number;
   attacks: any;
   evolutions: any;
   image: string;
@@ -15,8 +32,24 @@ interface pokemonData {
 
 export default function Page() {
   let pokeData: pokemonData = {
+    id: "",
+    number: "",
     name: "",
-    image: "",
+    weight: {
+      minimum: "",
+      maximum: "",
+    },
+    height: {
+      minimum: "",
+      maximum: "",
+    },
+    classification: "",
+    types: [""],
+    resistant: [""],
+    weaknesses: [""],
+    fleeRate: 0,
+    maxCP: 0,
+    maxHP: 0,
     attacks: {
       fast: [],
       special: [],
@@ -24,27 +57,51 @@ export default function Page() {
     evolutions: {
       name: "",
     },
+    image: "",
   };
   const [pokeSearch, setPokeSearch] = React.useState("");
   const [pokemonData, setPokemonData] = React.useState<pokemonData>(pokeData);
+  const [notFound, setnotFound] = React.useState(false);
+
   console.log(pokeSearch);
 
-  const [getPokemonData, { loading, error, data }] = useLazyQuery(GET_POKEMON, {
+  const [getPokemonData, { loading, error }] = useLazyQuery(GET_POKEMON, {
     variables: { name: pokeSearch },
     onCompleted(data) {
-      // console.log(data),
-      setPokemonData({
-        name: data.pokemon.name,
-        attacks: {
-          fast: data.pokemon.attacks.fast,
-          special: data.pokemon.attacks.special,
-        },
-        evolutions: data.pokemon.evolutions,
-        image: data.pokemon.image,
-      });
+      console.log(data);
+      if (data.pokemon === null) {
+        setPokemonData(pokeData);
+        setnotFound(true);
+      } else {
+        setPokemonData({
+          id: data.pokemon.id,
+          name: data.pokemon.name,
+          number: data.pokemon.number,
+          classification: data.pokemon.classification,
+          fleeRate: data.pokemon.fleeRate,
+          height: data.pokemon.height,
+          weight: data.pokemon.weight,
+          maxCP: data.pokemon.maxCP,
+          maxHP: data.pokemon.maxHP,
+          resistant: data.pokemon.resistant,
+          weaknesses: data.pokemon.weaknesses,
+          attacks: {
+            fast: data.pokemon.attacks.fast,
+            special: data.pokemon.attacks.special,
+          },
+          evolutions: data.pokemon.evolutions,
+          image: data.pokemon.image,
+          types: data.pokemon.types,
+        });
+        setnotFound(false);
+      }
+    },
+    onError(error) {
+      console.log(error);
     },
   });
-  useEffect(() => {
+  console.log(loading, error);
+  useCallback(() => {
     getPokemonData({ variables: { name: pokeSearch } });
   }, [getPokemonData, pokeSearch]);
   // console.log(data);
@@ -54,10 +111,10 @@ export default function Page() {
     setPokeSearch(data.name);
     getPokemonData();
   };
-  // console.log(pokemonData);
+  console.log(pokemonData);
   const changeByEvolution = (newName: string) => {
-    setPokeSearch(newName)
-  }
+    setPokeSearch(newName);
+  };
 
   return (
     <div>
@@ -65,15 +122,10 @@ export default function Page() {
         <input {...register("name")} />
         <input type="submit" />
       </form>
-      {/* <button onClick={() => getPokemonData()}>click</button> */}
-      {pokemonData.name !== "" && (
-        <Card
-          attacks={pokemonData.attacks}
-          name={pokemonData.name}
-          evolutions={pokemonData.evolutions}
-          image={pokemonData.image}
-          setSearch={changeByEvolution}
-        />
+      {!loading && notFound && <div>Not Found Pokemon</div>}
+      {loading && <div> Loading Pokemon ...</div>}
+      {!loading && pokemonData.name !== "" && (
+        <Card pokemon={pokemonData} setSearch={changeByEvolution} />
       )}
     </div>
   );
