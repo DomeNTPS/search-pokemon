@@ -25,9 +25,13 @@ query pokemon($id: String, $name: String) {
     attacks {
       fast {
         name
+        type
+        damage
       }
       special {
         name
+        type
+        damage
       }
     }
     evolutions {

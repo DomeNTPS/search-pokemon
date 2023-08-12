@@ -1,23 +1,29 @@
 import React from "react";
 import Image from "next/image";
 import styled from "styled-components";
-import { pokemonData } from "../../pages";
+import { pokemonData } from "../../pages/pokemon/Search";
+import { StyledType, Detail, Header } from "../styled-components/text-styled";
 
-const MainPokemon = styled.div<{ type?: string }>`
+const MainPokemon = styled.div`
   background: transparent;
   display: flex;
   margin: 30px;
+  align-items: center;
+  justify-content: space-around;
 `;
-const Detail = styled.div<{ type?: string }>`
+const Information = styled.div`
   background: transparent;
 `;
-const EvolutionChain = styled.div<{}>`
+const EvolutionChain = styled.div`
   display: flex;
   flex-direction: column;
   margin: 30px;
 `;
+
 const Attack = styled.div`
   display: flex;
+  flex-direction: column;
+  margin: 20px;
 `;
 
 interface card {
@@ -26,107 +32,117 @@ interface card {
 }
 
 const Card = ({ pokemon, setSearch }: card) => {
-  console.log(
-    pokemon.evolutions?.map((i: any, index: number) =>
-      console.log(i.evolutionRequirements)
-    )
-  );
+  console.log(pokemon.attacks);
   const handle = (e: string) => {
     console.log("set search card" + e);
     setSearch(e);
   };
 
   return (
-    <div>
+    <div style={{ fontFamily: "monospace" }}>
       <MainPokemon>
         <Image
           alt=""
           src={`${pokemon.image}`}
-          width={200}
-          height={200}
+          width={300}
+          height={300}
           style={{ margin: "0 30px" }}
         ></Image>
-        <Detail>
-          <div>Pokedex Number : {pokemon.number}</div>
-          <div>Name : {pokemon.name}</div>
-          <div style={{ display: "flex" }}>
+        <Information>
+          <Header> Detail </Header>
+          <Detail>Pokedex Number : {pokemon.number}</Detail>
+          <Detail>Name : {pokemon.name}</Detail>
+          <Detail style={{ display: "flex" }}>
             Type :
             {pokemon.types.map((type, index) => (
-              <div key={index} style={{ margin: "0 10px", color: type }}>
+              <StyledType key={index} type={type}>
                 {type}
-              </div>
+              </StyledType>
             ))}
-          </div>
-          <div>Class : {pokemon.classification}</div>
-          <div>
+          </Detail>
+          <Detail>Class : {pokemon.classification}</Detail>
+          <Detail>
             Weight: {pokemon.weight.minimum} ~ {pokemon.weight.maximum}
-          </div>
-          <div>
+          </Detail>
+          <Detail>
             Height : {pokemon.height.minimum} ~ {pokemon.height.maximum}
-          </div>
-          <div>
+          </Detail>
+          <Detail>
             Resistant :{" "}
             {pokemon.resistant.map((types, index) => (
-              <div key={index}> {types}</div>
+              <StyledType key={index} type={types}>
+                {" "}
+                {types}
+              </StyledType>
             ))}
-          </div>
-          <div>
+          </Detail>
+          <Detail>
             Weaknesses:
             {pokemon.weaknesses.map((types, index) => (
-              <div key={index}> {types}</div>
+              <StyledType key={index} type={types}>
+                {" "}
+                {types}
+              </StyledType>
+            ))}
+          </Detail>
+          <Detail>Flee rate : {pokemon.fleeRate}</Detail>
+          <Detail>Max HP : {pokemon.maxHP}</Detail>
+          <Detail>Max CP : {pokemon.maxCP}</Detail>
+        </Information>
+      </MainPokemon>
+      {pokemon.evolutions ? (
+        <EvolutionChain>
+          <Header>Evolution Chart</Header>
+          <div style={{ display: "flex" }}>
+            {pokemon.evolutions?.map((i: any, index: number) => (
+              <div key={index} onClick={() => handle(i.name)}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    margin: "20px",
+                    fontSize: "large"
+                  }}
+                >
+                  <Image
+                    alt=""
+                    src={`${i.image}`}
+                    width={150}
+                    height={150}
+                    style={{ marginBottom: "20px" }}
+                  ></Image>
+                  {i.name}
+                </div>
+              </div>
             ))}
           </div>
-          <div>Flee rate : {pokemon.fleeRate}</div>
-          <div>Max HP : {pokemon.maxHP}</div>
-          <div>Max CP : {pokemon.maxCP}</div>
-        </Detail>
-      </MainPokemon>
+        </EvolutionChain>
+      ) : (
+        <Header style={{ margin: "20px" }}>Evolution : Max Evolution </Header>
+      )}
       <Attack>
-        <div> Attack </div>
-        <div>
-          Fast Attack
-          {pokemon.attacks?.fast?.map((i: any, index: number) => (
-            <li key={index}>{i.name}</li>
-          ))}
-        </div>
-        <div>
-          Special Attack
-          {pokemon.attacks?.special?.map((i: any, index: number) => (
-            <li key={index}>{i.name}</li>
-          ))}
+        <Header> Attack </Header>
+        <div style={{ display: "flex", marginTop: "20px" }}>
+          <div style={{ margin: "10px", fontSize: "large" }}>
+            Fast Attack
+            {pokemon.attacks?.fast?.map((i: any, index: number) => (
+              <div key={index} style={{ margin: "10px 0", display: "flex", alignItems: 'center' }}>
+                <StyledType type={i.type}> {i.name} </StyledType> Damage:{" "}
+                {i.damage}
+              </div>
+            ))}
+          </div>
+          <div style={{ margin: "10px", fontSize: "large" }}>
+            Special Attack
+            {pokemon.attacks?.special?.map((i: any, index: number) => (
+              <div key={index} style={{ margin: "10px 0", display: "flex", alignItems: 'center' }}>
+                <StyledType type={i.type}> {i.name} </StyledType> Damage:{" "}
+                {i.damage}
+              </div>
+            ))}
+          </div>
         </div>
       </Attack>
-      <EvolutionChain>
-        <div>Evolution</div>
-        <div style={{ display: "flex" }}>
-          {pokemon.evolutions?.map((i: any, index: number) => (
-            <div key={index} onClick={() => handle(i.name)}>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column-reverse",
-                  margin: "20px",
-                }}
-              >
-                {i.name}
-                <Image
-                  alt=""
-                  src={`${i.image}`}
-                  width={100}
-                  height={100}
-                ></Image>
-                {/* {i.evolutionRequirements?.map((item: any, index: number) => {
-                  <div key={index}>
-                    <div>
-                      {item.name} : {item.usage}
-                    </div>
-                  </div>;
-                })} */}
-              </div>
-            </div>
-          ))}
-        </div>
-      </EvolutionChain>
     </div>
   );
 };
