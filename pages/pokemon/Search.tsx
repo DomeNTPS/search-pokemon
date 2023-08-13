@@ -104,7 +104,7 @@ const Search = () => {
   }, [getPokemonData, pokeSearch]);
   // console.log(data);
   const { register, handleSubmit } = useForm();
-  const onSubmit = (data: any) => {
+  function onSubmit (data: any) {
     // console.log(data);
     setPokeSearch(data.name);
     getPokemonData();
