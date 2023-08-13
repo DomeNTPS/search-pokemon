@@ -18,12 +18,14 @@ const EvolutionChain = styled.div`
   display: flex;
   flex-direction: column;
   margin: 30px;
+  align-items: center;
 `;
 
 const Attack = styled.div`
   display: flex;
   flex-direction: column;
   margin: 20px;
+  align-items: center;
 `;
 
 interface card {
@@ -49,7 +51,7 @@ const Card = ({ pokemon, setSearch }: card) => {
           style={{ margin: "0 30px" }}
         ></Image>
         <Information>
-          <Header> Detail </Header>
+          <Header>{pokemon.name} Detail </Header>
           <Detail>Pokedex Number : {pokemon.number}</Detail>
           <Detail>Name : {pokemon.name}</Detail>
           <Detail style={{ display: "flex" }}>

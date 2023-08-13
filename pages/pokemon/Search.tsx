@@ -114,11 +114,18 @@ const Search = () => {
     setPokeSearch(newName);
   };
   return (
-    <div>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <input {...register("name")} id="search-box" placeholder="search pokemon" />
-        <input type="submit" id="submit-button" value='submit' />
-      </form>
+    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: '20px' }}>
+        Search Pokemon :
+        <form onSubmit={handleSubmit(onSubmit)} style={{ marginLeft: "10px" }}>
+          <input
+            {...register("name")}
+            id="search-box"
+            placeholder="search pokemon"
+          />
+          <input type="submit" id="submit-button" value="submit" />
+        </form>
+      </div>
       {!loading && notFound && <div>Not Found Pokemon</div>}
       {loading && <div> Loading Pokemon ...</div>}
       {!loading && pokemonData.name !== "" && (
