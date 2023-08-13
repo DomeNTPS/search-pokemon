@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useLazyQuery } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import GET_POKEMON from "../../gql/queries/pokemon";
@@ -28,7 +28,12 @@ export interface pokemonData {
   image: string;
 }
 
-const Search = () => {
+interface searchProps {
+  pokemonName: string;
+  setPokemonSeach?: any
+}
+
+const Search = ({ pokemonName, setPokemonSeach }: searchProps) => {
   let pokeData: pokemonData = {
     id: "",
     number: "",
@@ -57,16 +62,13 @@ const Search = () => {
     },
     image: "",
   };
-  const [pokeSearch, setPokeSearch] = React.useState("");
+  // const [pokeSearch, setPokeSearch] = React.useState("");
   const [pokemonData, setPokemonData] = React.useState<pokemonData>(pokeData);
   const [notFound, setnotFound] = React.useState(false);
 
-  console.log(pokeSearch);
-
   const [getPokemonData, { loading, error }] = useLazyQuery(GET_POKEMON, {
-    variables: { name: pokeSearch },
+    variables: { name: pokemonName },
     onCompleted(data) {
-      console.log(data);
       if (data.pokemon === null) {
         setPokemonData(pokeData);
         setnotFound(true);
@@ -98,37 +100,23 @@ const Search = () => {
       console.log(error);
     },
   });
-  console.log(loading, error);
-  useCallback(() => {
-    getPokemonData({ variables: { name: pokeSearch } });
-  }, [getPokemonData, pokeSearch]);
-  // console.log(data);
-  const { register, handleSubmit } = useForm();
-  function onSubmit (data: any) {
-    // console.log(data);
-    setPokeSearch(data.name);
-    getPokemonData();
-  };
-  console.log(pokemonData);
+
+  useEffect(() => {
+    console.log(pokemonName)
+    getPokemonData({ variables: { name: pokemonName } });
+  }, [pokemonName]);
+
   const changeByEvolution = (newName: string) => {
-    setPokeSearch(newName);
+    setPokemonSeach(newName);
   };
   return (
-    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-      <div style={{ display: "flex", justifyContent: "center", marginBottom: '20px' }}>
-        Search Pokemon :
-        <form onSubmit={handleSubmit(onSubmit)} style={{ marginLeft: "10px" }}>
-          <input
-            {...register("name")}
-            id="search-box"
-            placeholder="search pokemon"
-          />
-          <input type="submit" id="submit-button" value="submit" />
-        </form>
-      </div>
+    <div
+      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
+      {error && <div> You need to enter name of the Pokémon</div>}
       {!loading && notFound && <div>Not Found Pokemon</div>}
       {loading && <div> Loading Pokemon ...</div>}
-      {!loading && pokemonData.name !== "" && (
+      {!error && !loading && pokemonData.name !== "" && (
         <Card pokemon={pokemonData} setSearch={changeByEvolution} />
       )}
     </div>

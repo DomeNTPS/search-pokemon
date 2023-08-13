@@ -34,9 +34,7 @@ interface card {
 }
 
 const Card = ({ pokemon, setSearch }: card) => {
-  console.log(pokemon.attacks);
   const handle = (e: string) => {
-    console.log("set search card" + e);
     setSearch(e);
   };
 
@@ -51,13 +49,13 @@ const Card = ({ pokemon, setSearch }: card) => {
           style={{ margin: "0 30px" }}
         ></Image>
         <Information>
-          <Header>{pokemon.name} Detail </Header>
+          <Header aria-label="name">{pokemon.name} Detail</Header>
           <Detail>Pokedex Number : {pokemon.number}</Detail>
           <Detail>Name : {pokemon.name}</Detail>
           <Detail style={{ display: "flex" }}>
             Type :
             {pokemon.types.map((type, index) => (
-              <StyledType key={index} type={type}>
+              <StyledType key={index} type={type} aria-label="type">
                 {type}
               </StyledType>
             ))}
